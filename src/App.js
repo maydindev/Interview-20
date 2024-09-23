@@ -1,3 +1,4 @@
+"use client";
 import React, { useMemo, useState } from "react";
 import axios from "axios";
 
@@ -23,7 +24,7 @@ const CURRENCY_NAME_TO_CODE = {
   "Bolivian Boliviano": "BOB",
   "Brazilian Real": "BRL",
   "Bahamian Dollar": "BSD",
-  Bitcoin: "BTC",
+  "Bitcoin": "BTC",
   "Bhutanese Ngultrum": "BTN",
   "Botswanan Pula": "BWP",
   "Belarusian Ruble": "BYN",
@@ -48,7 +49,7 @@ const CURRENCY_NAME_TO_CODE = {
   "Egyptian Pound": "EGP",
   "Eritrean Nakfa": "ERN",
   "Ethiopian Birr": "ETB",
-  Euro: "EUR",
+  "Euro": "EUR",
   "Fijian Dollar": "FJD",
   "Falkland Islands Pound": "FKP",
   "British Pound Sterling": "GBP",
@@ -166,13 +167,109 @@ const CURRENCY_NAME_TO_CODE = {
   "Yemeni Rial": "YER",
   "South African Rand": "ZAR",
   "Zambian Kwacha": "ZMW",
-  "Zimbabwean Dollar": "ZWL"
+  "Zimbabwean Dollar": "ZWL",
 };
 
 function App() {
   return <CurrencyConverter />;
 }
 
-const CurrencyConverter = () => {};
+const CurrencyConverter = () => {
+  const [result, setResult] = useState("");
+  const [currencyCodeFrom, setCurrencyCodeFrom] = useState("");
+  const [currencyCodeTo, setCurrencyCodeTo] = useState("");
+  const [amount, setAmount] = useState("");
+
+  const handleGetCurrency = () => {
+    /* Gmail s10
+    https://exchangerate.host/documentation
+    https://exchangerate.host/dashboard
+    https://exchangerate.host/quickstart
+    */
+    if (!result) {
+      const YOUR_ACCESS_KEY = "c8664b22de93729612c19c8a51ed4dd1";
+      axios
+        .get(
+          `https://api.exchangerate.host/convert?access_key=${YOUR_ACCESS_KEY}&from=${currencyCodeFrom}&to=${currencyCodeTo}&amount=${amount}&format=1`
+        )
+        .then((response) => {
+          console.log(response.data.result);
+          setResult(response.data.result);
+        });
+    }
+  };
+
+  const handleKeyPress = (e) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      handleGetCurrency();
+    }
+  };
+
+  return (
+    <div className="flex items-center justify-center mt-10">
+    <form onKeyPress={handleKeyPress}>
+      <div>
+        <span>Convert</span>
+
+        <input
+          type="number"
+          className="border border-gray-700 m-5 text-center"
+          style={{ height: '50px' }}
+          value={amount}
+          onChange={(e) => setAmount(e.target.value)}
+        />
+
+        <span>from</span>
+
+        <select
+          name="currency"
+          id="currency"
+          className="border border-gray-700 m-5 text-center"
+          style={{ height: '50px' }}
+          onChange={(e) => setCurrencyCodeFrom(e.target.value)}
+          value={currencyCodeFrom}
+          
+        >
+          <option value="" disabled>Select Currency</option>
+          {Object.entries(CURRENCY_NAME_TO_CODE).map(([name, code]) => (
+            <option key={code} value={code}>
+              {name}
+            </option>
+          ))}
+        </select>
+
+        <span>to</span>
+
+        <select
+          name="currency"
+          id="currency"
+          className="border border-gray-700 m-5 text-center"
+          style={{ height: '50px' }}
+          onChange={(e) => setCurrencyCodeTo(e.target.value)}
+          value={currencyCodeTo}
+          
+        >
+          <option value="" disabled>Select Currency</option>
+          {Object.entries(CURRENCY_NAME_TO_CODE).map(([name, code]) => (
+            <option key={code} value={code}>
+              {name}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      <div>
+        <p className="flex items-center justify-center mt-5 font-bold">
+          {result &&
+            `${amount}
+        ${currencyCodeFrom} = ${result}
+        ${currencyCodeTo} `}
+        </p>
+      </div>
+    </form>
+    </div>
+  );
+};
 
 export default App;

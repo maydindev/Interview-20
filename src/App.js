@@ -206,7 +206,6 @@ const CurrencyConverter = () => {
         document.activeElement.tagName !== "INPUT" &&
         document.activeElement.tagName !== "SELECT"
       ) {
-        e.preventDefault();
         handleGetCurrency();
       }
     };

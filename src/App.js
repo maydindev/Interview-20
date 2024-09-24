@@ -1,5 +1,5 @@
 "use client";
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useState, useEffect } from "react";
 import axios from "axios";
 
 const CURRENCY_NAME_TO_CODE = {
@@ -24,7 +24,7 @@ const CURRENCY_NAME_TO_CODE = {
   "Bolivian Boliviano": "BOB",
   "Brazilian Real": "BRL",
   "Bahamian Dollar": "BSD",
-  "Bitcoin": "BTC",
+  Bitcoin: "BTC",
   "Bhutanese Ngultrum": "BTN",
   "Botswanan Pula": "BWP",
   "Belarusian Ruble": "BYN",
@@ -49,7 +49,7 @@ const CURRENCY_NAME_TO_CODE = {
   "Egyptian Pound": "EGP",
   "Eritrean Nakfa": "ERN",
   "Ethiopian Birr": "ETB",
-  "Euro": "EUR",
+  Euro: "EUR",
   "Fijian Dollar": "FJD",
   "Falkland Islands Pound": "FKP",
   "British Pound Sterling": "GBP",
@@ -199,75 +199,89 @@ const CurrencyConverter = () => {
     }
   };
 
-  const handleKeyPress = (e) => {
-    if (e.key === "Enter") {
-      e.preventDefault();
-      handleGetCurrency();
-    }
-  };
+  useEffect(() => {
+    const handleKeyPress = (e) => {
+      if (
+        e.key === "Enter" &&
+        document.activeElement.tagName !== "INPUT" &&
+        document.activeElement.tagName !== "SELECT"
+      ) {
+        e.preventDefault();
+        handleGetCurrency();
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyPress);
+
+    return () => {
+      window.removeEventListener("keydown", handleKeyPress);
+    };
+  }, [amount, currencyCodeFrom, currencyCodeTo]);
 
   return (
     <div className="flex items-center justify-center mt-10">
-    <form onKeyPress={handleKeyPress}>
       <div>
-        <span>Convert</span>
+        <div>
+          <span>Convert</span>
 
-        <input
-          type="number"
-          className="border border-gray-700 m-5 text-center"
-          style={{ height: '50px' }}
-          value={amount}
-          onChange={(e) => setAmount(e.target.value)}
-        />
+          <input
+            type="number"
+            className="border border-gray-700 m-5 text-center"
+            style={{ height: "50px" }}
+            value={amount}
+            onChange={(e) => setAmount(e.target.value)}
+          />
 
-        <span>from</span>
+          <span>from</span>
 
-        <select
-          name="currency"
-          id="currency"
-          className="border border-gray-700 m-5 text-center"
-          style={{ height: '50px' }}
-          onChange={(e) => setCurrencyCodeFrom(e.target.value)}
-          value={currencyCodeFrom}
-          
-        >
-          <option value="" disabled>Select Currency</option>
-          {Object.entries(CURRENCY_NAME_TO_CODE).map(([name, code]) => (
-            <option key={code} value={code}>
-              {name}
+          <select
+            name="currency"
+            id="currency"
+            className="border border-gray-700 m-5 text-center"
+            style={{ height: "50px" }}
+            onChange={(e) => setCurrencyCodeFrom(e.target.value)}
+            value={currencyCodeFrom}
+          >
+            <option value="" disabled>
+              Select Currency
             </option>
-          ))}
-        </select>
+            {Object.entries(CURRENCY_NAME_TO_CODE).map(([name, code]) => (
+              <option key={code} value={code}>
+                {name}
+              </option>
+            ))}
+          </select>
 
-        <span>to</span>
+          <span>to</span>
 
-        <select
-          name="currency"
-          id="currency"
-          className="border border-gray-700 m-5 text-center"
-          style={{ height: '50px' }}
-          onChange={(e) => setCurrencyCodeTo(e.target.value)}
-          value={currencyCodeTo}
-          
-        >
-          <option value="" disabled>Select Currency</option>
-          {Object.entries(CURRENCY_NAME_TO_CODE).map(([name, code]) => (
-            <option key={code} value={code}>
-              {name}
+          <select
+            name="currency"
+            id="currency"
+            className="border border-gray-700 m-5 text-center"
+            style={{ height: "50px" }}
+            onChange={(e) => setCurrencyCodeTo(e.target.value)}
+            value={currencyCodeTo}
+          >
+            <option value="" disabled>
+              Select Currency
             </option>
-          ))}
-        </select>
-      </div>
+            {Object.entries(CURRENCY_NAME_TO_CODE).map(([name, code]) => (
+              <option key={code} value={code}>
+                {name}
+              </option>
+            ))}
+          </select>
+        </div>
 
-      <div>
-        <p className="flex items-center justify-center mt-5 font-bold">
-          {result &&
-            `${amount}
+        <div>
+          <p className="flex items-center justify-center mt-5 font-bold">
+            {result &&
+              `${amount}
         ${currencyCodeFrom} = ${result}
         ${currencyCodeTo} `}
-        </p>
+          </p>
+        </div>
       </div>
-    </form>
     </div>
   );
 };
